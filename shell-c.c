@@ -5,15 +5,23 @@
 #include <string.h>
 #include <sys/types.h>
 
+typedef struct child
+{
+  int child_id;
+  int child_status;
+  
+};
+
 int main()
 {
-  pid_t pid;
-  int status, count;
+  pid_t pid, wpid;
+  int status, count, fg_id;
 
   char cmd[1024], *tp;
 
   char quit[10] = "quit";
   char ex[10] = "exit";
+  char job[10] = "jobs";
 
   char *pargs[1024];
 
@@ -48,6 +56,23 @@ int main()
     {
       return 0;
     }
+    else if (strcmp(job, pargs[0]) == 0)
+    {
+      for (i = 0; i < p_n; i++)
+      {
+        //プロセスIDの表示
+        printf("%d\n", pid_id[i]);
+      }
+    }
+
+    else if (strcmp("fg", pargs[0]) == 0)
+    {
+      printf("FG実行したいプロセスの番号：");
+      fgets(fg, sizeof(fg), stdin);
+      fg_id = atoi(fg);
+
+      waitpid(fg_id, &status, WNOHANG);
+    }
     else
     {
       pid = fork();
@@ -55,7 +80,6 @@ int main()
       if (strcmp(pargs[count - 1], "&") == 0)
       {
         pargs[count - 1] = NULL;
-
         if (pid < 0)
         {
           perror("error");
@@ -65,6 +89,10 @@ int main()
           execv(pargs[0], pargs);
           perror(pargs[0]);
           exit(EXIT_SUCCESS);
+        }
+        else if (pid > 0)
+        {
+          printf("%d", pid);
         }
       }
       else
@@ -82,6 +110,7 @@ int main()
         else
         {
           wait(&status);
+          printf("%d", pid);
         }
       }
     }
