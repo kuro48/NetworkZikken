@@ -29,7 +29,6 @@ int main()
 
   for (int i = 0; i < 1024; i++)
   {
-
     child[i].pid = 0;
     child[i].status = 0;
     child[i].option = 0;
